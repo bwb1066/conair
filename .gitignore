@@ -1,0 +1,13 @@
+.hlx/
+coverage/
+logs/
+node_modules/
+
+helix-importer-ui
+.DS_Store
+*.bak
+.idea
+.wrangler
+.claude/settings.local.json
+.superpowers
+docs/adr/0000-own-the-page-lifecycle.spicy.md
