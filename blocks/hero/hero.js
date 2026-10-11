@@ -55,9 +55,31 @@ function decorateForeground(fg) {
   }
 }
 
+/**
+ * A single-row hero with the image inline above the heading: lift the image
+ * into its own background row so it renders as a full-bleed banner.
+ */
+function liftInlineBackground(el, fg) {
+  const pic = fg.querySelector('picture');
+  if (!pic) return null;
+  const holder = pic.closest('p');
+  const cell = document.createElement('div');
+  cell.append(pic);
+  if (holder && !holder.textContent.trim() && !holder.children.length) holder.remove();
+  const bg = document.createElement('div');
+  bg.append(cell);
+  el.prepend(bg);
+  el.classList.add('center', 'inline-bg');
+  return bg;
+}
+
 export default async function init(el) {
   const rows = [...el.querySelectorAll(':scope > div')];
   const fg = rows.pop();
+  if (!rows.length) {
+    const lifted = liftInlineBackground(el, fg);
+    if (lifted) rows.push(lifted);
+  }
   fg.classList.add('hero-foreground');
   decorateForeground(fg);
   if (rows.length) {

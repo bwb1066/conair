@@ -1,57 +1,35 @@
 @font-face {
-  font-family: Montserrat;
+  font-family: Figtree;
   font-style: normal;
-  font-weight: 100 900;
+  font-weight: 400;
   font-display: swap;
-  src: url("/styles/fonts/montserrat.woff2") format("woff2");
-  unicode-range:
-    U+0000-00FF,
-    U+0131,
-    U+0152-0153,
-    U+02BB-02BC,
-    U+02C6,
-    U+02DA,
-    U+02DC,
-    U+0304,
-    U+0308,
-    U+0329,
-    U+2000-206F,
-    U+20AC,
-    U+2122,
-    U+2191,
-    U+2193,
-    U+2212,
-    U+2215,
-    U+FEFF,
-    U+FFFD;
+  src: url("/styles/fonts/figtree-400.woff2") format("woff2");
 }
 
 @font-face {
-  font-family: Montserrat;
-  font-style: italic;
-  font-weight: 100 900;
+  font-family: Figtree;
+  font-style: normal;
+  font-weight: 600;
   font-display: swap;
-  src: url("/styles/fonts/montserrat-italic.woff2") format("woff2");
-  unicode-range:
-    U+0000-00FF,
-    U+0131,
-    U+0152-0153,
-    U+02BB-02BC,
-    U+02C6,
-    U+02DA,
-    U+02DC,
-    U+0304,
-    U+0308,
-    U+0329,
-    U+2000-206F,
-    U+20AC,
-    U+2122,
-    U+2191,
-    U+2193,
-    U+2212,
-    U+2215,
-    U+FEFF,
-    U+FFFD;
+  src: url("/styles/fonts/figtree-600.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: Figtree;
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/styles/fonts/figtree-700.woff2") format("woff2");
+}
+
+/* metric-matched local fallback so the Figtree swap doesn't shift layout */
+@font-face {
+  font-family: "Figtree Fallback";
+  src: local("Arial");
+  size-adjust: 96%;
+  ascent-override: 98%;
+  descent-override: 26%;
+  line-gap-override: 0%;
 }
 
 :root {
@@ -68,8 +46,8 @@
   --spacing-s: 8px;
   --spacing-xs: 4px;
 
-  /* color schemes */
-  color-scheme: light dark;
+  /* color schemes — pinned light: conair.com has no dark theme */
+  color-scheme: light;
 
   /* color tokens */
   --color-gray-100: #f1f1f1;
@@ -159,24 +137,29 @@
   --color-dark-base: 0 0 0;
   --color-light: rgb(255 255 255);
   --color-dark: rgb(0 0 0);
-  --color-text: light-dark(var(--color-dark), var(--color-light));
-  --color-link: light-dark(var(--color-gray-900), var(--color-gray-100));
-  --color-brand: var(--color-purple-500);
+  --color-text: var(--color-ink);
+  --color-link: var(--color-ink);
+  --color-brand: #ba78ed;
+  --color-brand-dark: #9b4fd8;
+  --color-cream: #fefcf6;
+  --color-sky: #c2eaff;
+  --color-pink: #f06;
+  --color-ink: #1a1816;
   --color-accent: light-dark(var(--color-magenta-600), var(--color-magenta-500));
   --color-background: light-dark(var(--color-light), var(--color-dark));
   --color-shaded: light-dark(#f9f9f9, #111);
 
   /* fonts */
-  --font-family: montserrat, "Trebuchet MS", sans-serif;
+  --font-family: figtree, "Figtree Fallback", arial, sans-serif;
 
   /* headings */
-  --heading-font-size-xxl: 32.44px;
-  --heading-font-size-xl: 28.83px;
-  --heading-font-size-l: 25.63px;
-  --heading-font-size-m: 22.78px;
-  --heading-font-size-s: 20.25px;
-  --heading-font-size-xs: 18px;
-  --heading-line-height: 1.15;
+  --heading-font-size-xxl: 36px;
+  --heading-font-size-xl: 30px;
+  --heading-font-size-l: 24px;
+  --heading-font-size-m: 20px;
+  --heading-font-size-s: 18px;
+  --heading-font-size-xs: 16px;
+  --heading-line-height: 1.25;
 
   /* body */
   --body-font-size-xxxl: 25px;
@@ -189,7 +172,9 @@
   --body-line-height: 1.6;
 
   /* misc */
-  --header-height: 64px;
+  --header-height: 104px; /* 40px promo banner + 64px bar */
+  --pill-radius: 30px;
+  --card-radius: 16px;
   --breadcrumb-height: 24px;
 }
 
@@ -209,7 +194,7 @@ body {
   margin: 0;
   background-color: var(--color-background);
   color: var(--color-text);
-  font-family: "Trebuchet MS", sans-serif;
+  font-family: arial, sans-serif;
   font-size: var(--body-font-size-m);
   line-height: var(--body-line-height);
   padding: var(--header-height) 0 0;
@@ -240,13 +225,24 @@ a {
   color: var(--color-link);
 
   &.btn {
-    display: inline-block;
-    line-height: 1;
-    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 200px;
+    min-height: 52px;
+    line-height: 1.2;
+    font-weight: 600;
     text-decoration: none;
-    border: 2px solid;
-    padding: 8px 12px;
+    text-transform: capitalize;
+    border: 1px solid;
+    border-radius: var(--pill-radius);
+    padding: 12px 32px;
     box-sizing: border-box;
+    transition: background-color 0.2s, color 0.2s, transform 0.2s;
+
+    &:hover {
+      transform: translateY(-1px);
+    }
 
     &.btn-outline {
       background: transparent;
@@ -264,9 +260,14 @@ a {
   }
 
   &.btn-primary {
-    color: var(--color-background);
-    background-color: var(--color-text);
-    border: 2px solid var(--color-text);
+    color: #fff;
+    background-color: #000;
+    border: 1px solid #000;
+
+    &:hover {
+      background-color: var(--color-brand-dark);
+      border-color: var(--color-brand-dark);
+    }
 
     &.btn-outline {
       color: var(--color-text);
@@ -275,12 +276,13 @@ a {
   }
 
   &.btn-secondary {
-    color: var(--color-background);
-    background-color: var(--color-gray-500);
-    border: 2px solid var(--color-gray-500);
+    color: #000;
+    background-color: #fff;
+    border: 1px solid #000;
 
-    &.btn-outline {
-      color: var(--color-gray-500);
+    &:hover {
+      color: #fff;
+      background-color: #000;
     }
   }
 
@@ -309,6 +311,40 @@ a {
   > .default-content {
     max-width: var(--grid-container-width);
     margin: 0 auto;
+  }
+}
+
+main > .section {
+  margin: 56px 0;
+
+  &:first-child {
+    margin-top: 0;
+  }
+
+  /* Conair section intros ("Shop by Category", "Customer Commitment") */
+  > .default-content {
+    text-align: center;
+
+    h2 {
+      margin: 0 0 8px;
+    }
+
+    p {
+      margin: 0 0 32px;
+    }
+  }
+
+  /* full-width bands sit flush with what follows */
+  &:has(> .block-content > .columns.text-only) {
+    margin-bottom: 0;
+
+    > .default-content h2 {
+      margin-bottom: 32px;
+    }
+  }
+
+  &:not(:has(*)) {
+    display: none;
   }
 }
 
@@ -344,6 +380,17 @@ h6 {
 }
 
 h1 { font-size: var(--heading-font-size-xxl); }
+
+@media (width >= 900px) {
+  :root {
+    --header-height: 170px; /* 40px promo banner + 130px two-row bar */
+    --heading-font-size-xxl: 48px;
+    --heading-font-size-xl: 40px;
+    --heading-font-size-l: 28px;
+    --heading-font-size-m: 20px;
+  }
+}
+
 h2 { font-size: var(--heading-font-size-xl); }
 h3 { font-size: var(--heading-font-size-l); }
 h4 { font-size: var(--heading-font-size-m); }

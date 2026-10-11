@@ -301,6 +301,101 @@ export function decorateHeaderContent(header) {
   new ResizeObserver(() => syncDrawerState(header)).observe(header);
 }
 
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+// Stroke icons for the header utility links, keyed by link text.
+const ACTION_ICONS = {
+  favorites: 'M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z',
+  login: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm-7 8a7 7 0 0 1 14 0',
+  cart: 'M6 8h12l-1 12H7L6 8zm3 0V6a3 3 0 0 1 6 0v2',
+};
+
+function makeIcon(d) {
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('aria-hidden', 'true');
+  svg.classList.add('action-icon');
+  const path = document.createElementNS(SVG_NS, 'path');
+  path.setAttribute('d', d);
+  svg.append(path);
+  return svg;
+}
+
+function makeSection(nodes) {
+  const section = document.createElement('div');
+  section.className = 'section';
+  const content = document.createElement('div');
+  content.className = 'default-content';
+  content.append(...nodes);
+  section.append(content);
+  return section;
+}
+
+function decorateActionLinks(list) {
+  for (const a of list.querySelectorAll('a')) {
+    const key = a.textContent.trim().toLowerCase().replace(/\s*\(.*\)/, '');
+    const d = ACTION_ICONS[key];
+    if (d) {
+      a.classList.add('action-link', `action-${key}`);
+      const label = document.createElement('span');
+      label.className = 'text';
+      label.textContent = a.textContent.trim();
+      a.replaceChildren(makeIcon(d), label);
+      if (key === 'cart') {
+        const count = document.createElement('span');
+        count.className = 'cart-count';
+        [count.textContent] = a.title.match(/\d+/) || ['0'];
+        a.append(count);
+      }
+    }
+  }
+}
+
+/**
+ * The authored Conair nav is [banner section] + one section holding the logo,
+ * the category list and the utility list. Author Kit's header wants three
+ * sections (brand / nav / actions), so split it, lift the banner out into its
+ * own top bar, and add the mobile menu toggle.
+ * @returns {Element|null} the banner section, if any
+ */
+function normalizeNav(fragment) {
+  const sections = [...fragment.querySelectorAll(':scope > .section')];
+  const banner = sections.find((s) => s.querySelector('.banner')) || null;
+  if (banner) banner.remove();
+  const rest = sections.filter((s) => s !== banner);
+  if (rest.length !== 1) return banner;
+
+  const content = rest[0].querySelector('.default-content');
+  if (!content) return banner;
+  const [navList, actionList] = content.querySelectorAll(':scope > ul');
+  const logo = content.querySelector(':scope > p');
+
+  const brandLink = document.createElement('a');
+  brandLink.href = '/';
+  brandLink.ariaLabel = 'Conair home';
+  // Only the picture: decorateBrandSection treats a second child node as
+  // screen-reader brand text and visually hides it.
+  const logoPic = logo?.querySelector('picture, img');
+  if (logoPic) brandLink.append(logoPic);
+  const brandP = document.createElement('p');
+  brandP.append(brandLink);
+
+  const toggleLink = document.createElement('a');
+  toggleLink.href = '/tools/widgets/toggle';
+  toggleLink.textContent = 'Menu';
+  const toggleP = document.createElement('p');
+  toggleP.append(toggleLink);
+
+  if (actionList) decorateActionLinks(actionList);
+
+  rest[0].replaceWith(
+    makeSection([brandP, toggleP]),
+    makeSection(navList ? [navList] : []),
+    makeSection(actionList ? [actionList] : []),
+  );
+  return banner;
+}
+
 /**
  * loads and decorates the header
  * @param {Element} el The header element
@@ -311,6 +406,11 @@ export default async function init(el) {
   try {
     const fragment = await loadFragment(`${locale.prefix}${path}`);
     fragment.classList.add('header-content');
+    const banner = normalizeNav(fragment);
+    if (banner) {
+      banner.className = 'header-banner';
+      el.append(banner);
+    }
     el.append(fragment);
     decorateHeaderContent(el);
   } catch (e) {

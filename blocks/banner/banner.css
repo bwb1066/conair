@@ -1,0 +1,21 @@
+.banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 8px 16px;
+  box-sizing: border-box;
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+  font-size: var(--body-font-size-s);
+  text-align: center;
+
+  > div,
+  .banner-text {
+    display: contents;
+  }
+
+  p {
+    margin: 0;
+  }
+}

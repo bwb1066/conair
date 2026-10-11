@@ -223,3 +223,43 @@
     }
   }
 }
+
+/* Conair: inline-image hero ("Having a bad hair day?") — rounded full-width
+   banner, big centered white headline anchored low on the image. */
+.hero.inline-bg {
+  --min-height: 420px;
+  --gradient-start: rgb(26 24 22 / 0%);
+  --gradient-end: rgb(26 24 22 / 35%);
+
+  border-radius: 24px;
+
+  .hero-foreground {
+    align-items: flex-end;
+    background: linear-gradient(180deg, var(--gradient-start) 40%, var(--gradient-end) 100%);
+    padding-bottom: 56px;
+  }
+
+  .hero-heading {
+    font-size: var(--heading-font-size-xxl);
+    text-shadow: 0 2px 12px rgb(26 24 22 / 25%);
+  }
+}
+
+@media (width >= 900px) {
+  .hero.inline-bg {
+    --min-height: 0;
+
+    aspect-ratio: 1440 / 540;
+
+    .hero-foreground {
+      display: flex;
+      height: 100%;
+      max-width: none;
+      background: linear-gradient(180deg, var(--gradient-start) 40%, var(--gradient-end) 100%);
+    }
+
+    .hero-heading {
+      font-size: 56px;
+    }
+  }
+}
