@@ -11,6 +11,7 @@ import store, { setThumb } from '../../scripts/commerce.js';
  * @param {Element} block The block element
  */
 
+const L = store.labels;
 let drawer = null;
 let panel = null;
 
@@ -63,22 +64,22 @@ function renderPanel() {
 
   const head = document.createElement('div');
   head.className = 'quote-cart-head';
-  head.innerHTML = '<h2 class="quote-cart-title">Your Quote</h2>'
-    + '<button type="button" class="quote-cart-close" aria-label="Close quote">×</button>';
+  head.innerHTML = `<h2 class="quote-cart-title">${L.cart}</h2>`
+    + `<button type="button" class="quote-cart-close" aria-label="${L.close}">×</button>`;
   head.querySelector('.quote-cart-close').addEventListener('click', () => drawer.classList.remove('is-open'));
   panel.append(head);
 
   if (buyer) {
     const banner = document.createElement('p');
     banner.className = 'quote-cart-buyer';
-    banner.textContent = `Contract pricing applied · ${buyer.company || buyer.key}`;
+    banner.textContent = `${L.buyer} · ${buyer.company || buyer.key}`;
     panel.append(banner);
   }
 
   if (!quote.lines.length) {
     const empty = document.createElement('p');
     empty.className = 'quote-cart-empty';
-    empty.textContent = 'Your quote is empty. Add products to request pricing and lead times.';
+    empty.textContent = L.empty;
     panel.append(empty);
     return;
   }
@@ -93,13 +94,13 @@ function renderPanel() {
   const lead = leadRollup(quote);
   foot.innerHTML = `
     <div class="quote-cart-subtotal">
-      <span>Estimated subtotal</span>
+      <span>${L.subtotal}</span>
       <strong>${store.formatPrice(store.quoteTotal(quote))}</strong>
     </div>
-    <p class="quote-cart-leadnote">${lead > 0 ? `Longest lead time: ${lead} days` : 'All lines in stock'}</p>
-    <textarea class="quote-cart-note" rows="2" placeholder="Add a note (target date, application, PO#)…"></textarea>
-    <button type="button" class="quote-cart-submit">Request Quote</button>
-    <p class="quote-cart-terms">Pricing &amp; lead times are confirmed by the seller. No payment is taken here.</p>`;
+    <p class="quote-cart-leadnote">${lead > 0 ? L.lead(lead) : L.inStock}</p>
+    <textarea class="quote-cart-note" rows="2" placeholder="${L.note}"></textarea>
+    <button type="button" class="quote-cart-submit">${L.submit}</button>
+    <p class="quote-cart-terms">${L.terms}</p>`;
 
   foot.querySelector('.quote-cart-submit').addEventListener('click', async () => {
     const note = foot.querySelector('.quote-cart-note').value;
@@ -107,8 +108,8 @@ function renderPanel() {
     panel.replaceChildren();
     const done = document.createElement('div');
     done.className = 'quote-cart-done';
-    done.innerHTML = `<h2 class="quote-cart-title">Quote requested</h2>
-      <p>Reference <strong>${submitted.quote_number}</strong>. A specialist will confirm pricing and lead times shortly.</p>
+    done.innerHTML = `<h2 class="quote-cart-title">${L.doneTitle}</h2>
+      <p>${L.doneBody(submitted.quote_number)}</p>
       <button type="button" class="quote-cart-close-2">Done</button>`;
     done.querySelector('.quote-cart-close-2').addEventListener('click', () => drawer.classList.remove('is-open'));
     panel.append(done);
@@ -130,7 +131,7 @@ function buildDrawer() {
   panel = document.createElement('aside');
   panel.className = 'quote-cart-panel';
   panel.setAttribute('role', 'dialog');
-  panel.setAttribute('aria-label', 'Your quote');
+  panel.setAttribute('aria-label', L.cart);
   drawer.append(backdrop, panel);
   document.body.append(drawer);
   document.addEventListener('keydown', (e) => {

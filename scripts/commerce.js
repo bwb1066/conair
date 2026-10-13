@@ -48,9 +48,51 @@ const API = `${COMMERCE_URL}/functions/v1/commerce`;
 const SUPABASE_ESM = 'https://esm.sh/@supabase/supabase-js@2';
 const CART_KEY = `commerce_quote_${SITE_KEY}`;
 const CARTID_KEY = `commerce_cartid_${SITE_KEY}`;
-// Label the concierge/agent surfaces show on their add-to-quote control. B2C
-// tenants can set `commerce-cta-label: Add to cart` in page metadata.
-const CTA_LABEL = getMetadata('commerce-cta-label') || 'Add to quote';
+// Storefront copy. `commerce-mode: retail` swaps the B2B quote wording for B2C
+// cart/checkout wording everywhere (drawer, buttons, confirmation);
+// `commerce-cart-label` / `commerce-submit-label` / `commerce-cta-label`
+// override single labels on top of either set.
+const MODE = (getMetadata('commerce-mode') || '').trim().toLowerCase() === 'retail' ? 'retail' : 'quote';
+const COPY = {
+  quote: {
+    cta: 'Add to quote',
+    cart: 'Your Quote',
+    submit: 'Request Quote',
+    close: 'Close quote',
+    empty: 'Your quote is empty. Add products to request pricing and lead times.',
+    buyer: 'Contract pricing applied',
+    subtotal: 'Estimated subtotal',
+    lead: (days) => `Longest lead time: ${days} days`,
+    inStock: 'All lines in stock',
+    note: 'Add a note (target date, application, PO#)…',
+    terms: 'Pricing &amp; lead times are confirmed by the seller. No payment is taken here.',
+    doneTitle: 'Quote requested',
+    doneBody: (ref) => `Reference <strong>${ref}</strong>. A specialist will confirm pricing and lead times shortly.`,
+  },
+  retail: {
+    cta: 'Add to cart',
+    cart: 'Your Cart',
+    submit: 'Place Order',
+    close: 'Close cart',
+    empty: 'Your cart is empty.',
+    buyer: 'Member pricing applied',
+    subtotal: 'Subtotal',
+    lead: (days) => `Ships in up to ${days} days`,
+    inStock: 'All items in stock',
+    note: 'Add a note (gift message, delivery instructions)…',
+    terms: 'Demo checkout. No payment is taken.',
+    doneTitle: 'Order placed',
+    doneBody: (ref) => `Order <strong>${ref}</strong> is confirmed. A confirmation email is on its way.`,
+  },
+}[MODE];
+const LABELS = {
+  ...COPY,
+  cta: getMetadata('commerce-cta-label') || COPY.cta,
+  cart: getMetadata('commerce-cart-label') || COPY.cart,
+  submit: getMetadata('commerce-submit-label') || COPY.submit,
+};
+// Label the concierge/agent surfaces show on their add-to-quote control.
+const CTA_LABEL = LABELS.cta;
 // PDP template path — product cards link here with ?sku=<sku> so any catalog
 // product resolves on one dynamic product page.
 const PDP_URL = getMetadata('commerce-pdp') || '/drafts/pdp';
@@ -442,6 +484,8 @@ const store = {
   remote: REMOTE,
   enabled: true,
   ctaLabel: CTA_LABEL,
+  mode: MODE,
+  labels: LABELS,
   pdpUrl: PDP_URL,
   formatPrice,
   resolvePrice,
