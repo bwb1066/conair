@@ -175,6 +175,16 @@
   --header-height: 104px; /* 40px promo banner + 64px bar */
   --pill-radius: 30px;
   --card-radius: 16px;
+
+  /* tokens the commerce blocks (product-cards / -detail, quote-cart) read */
+  --cta-color: var(--color-ink);
+  --cta-color-hover: var(--color-brand-dark);
+  --dark-color: var(--color-gray-700);
+  --light-color: var(--color-purple-100);
+  --link-color: var(--color-ink);
+  --text-color: var(--color-ink);
+  --background-color: #fff;
+  --rounded-sm: 8px;
   --breadcrumb-height: 24px;
 }
 
@@ -337,10 +347,6 @@ main > .section {
   /* full-width bands sit flush with what follows */
   &:has(> .block-content > .columns.text-only) {
     margin-bottom: 0;
-
-    > .default-content h2 {
-      margin-bottom: 32px;
-    }
   }
 
   &:not(:has(*)) {

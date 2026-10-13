@@ -1,3 +1,9 @@
+/* Conair: sit on the page container like the other home-page bands */
+.product-cards {
+  max-width: var(--grid-container-width);
+  margin: 0 auto;
+}
+
 .product-cards .product-cards-inner {
   display: flex;
   flex-direction: column;
@@ -6,7 +12,9 @@
 
 .product-cards .product-cards-heading {
   margin: 0;
-  font-size: var(--heading-font-size-l);
+  font-size: var(--heading-font-size-xl);
+  font-weight: 400;
+  text-align: center;
 }
 
 .product-cards .product-cards-search input {
@@ -179,4 +187,8 @@
 
 @media (width >= 900px) {
   .product-cards .product-cards-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (width >= 1200px) {
+  .product-cards .product-cards-grid { grid-template-columns: repeat(4, 1fr); }
 }

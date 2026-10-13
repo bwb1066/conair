@@ -101,11 +101,30 @@
   }
 }
 
-/* Conair media split: edge-to-edge image half, copy half with generous
-   padding; image corners round toward the page, never at the viewport edge. */
+/* Conair media split: edge-to-edge image half, copy half on a color panel
+   (Conair purple; `berry` variant = pink with an outlined button, as on
+   conair.com). Image corners round toward the page, never at the viewport edge. */
 .columns.media {
+  --panel-color: var(--color-brand);
+
   .row {
+    align-items: stretch;
     gap: 0;
+  }
+
+  &.berry {
+    --panel-color: var(--color-pink);
+
+    .btn {
+      color: #000;
+      background-color: #fff;
+      border: 1px solid #000;
+
+      &:hover {
+        color: #fff;
+        background-color: #000;
+      }
+    }
   }
 
   .media-image {
@@ -123,18 +142,27 @@
   }
 
   .col:not(.media-image) {
-    padding: 32px 16px 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 32px 20px 48px;
+    background-color: var(--panel-color);
+    color: var(--color-ink);
 
     h2 {
       margin: 0 0 12px;
       font-size: var(--heading-font-size-xl);
+      font-weight: 400;
+      line-height: 1.25;
     }
 
     p {
-      font-size: var(--body-font-size-l);
+      margin: 0;
+      font-size: var(--body-font-size-xl);
     }
 
     .btn {
+      min-width: 288px;
       margin-top: 24px;
     }
   }
@@ -147,19 +175,33 @@
   text-align: center;
 
   .row {
-    gap: 24px;
+    gap: 64px 24px;
   }
 
-  h3 {
+  h3,
+  p {
     margin: 0;
     font-size: var(--body-font-size-xl);
-    font-weight: 500;
+    font-weight: 400;
+  }
+
+  /* authored as :receipt: / :delivery: / :calendar: icons above each label */
+  .icon {
+    display: block;
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 16px;
   }
 }
 
 .section:has(> .block-content > .columns.text-only) {
-  padding: 48px 0 64px;
+  padding: 64px 0;
   background-color: var(--color-sky);
+
+  > .default-content h2 {
+    margin-bottom: 40px;
+    font-weight: 400;
+  }
 }
 
 @media (width >= 900px) {
@@ -176,8 +218,8 @@
     .col:not(.media-image) {
       padding: 48px 108px;
 
-      p {
-        max-width: 34ch;
+      .btn {
+        margin-top: 48px;
       }
     }
 
@@ -189,6 +231,16 @@
           border-radius: 0 0 0 24px;
         }
       }
+    }
+  }
+}
+
+@media (width >= 900px) {
+  .section:has(> .block-content > .columns.text-only) {
+    padding: 96px 0;
+
+    > .default-content h2 {
+      margin-bottom: 96px;
     }
   }
 }

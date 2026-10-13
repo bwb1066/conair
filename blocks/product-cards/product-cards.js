@@ -107,13 +107,13 @@ function buildCard(product) {
   const add = document.createElement('button');
   add.type = 'button';
   add.className = 'product-card-add';
-  add.textContent = 'Add to quote';
+  add.textContent = store.ctaLabel;
   add.addEventListener('click', async () => {
     await store.addToQuote(product.sku, 1, 'web');
     add.textContent = 'Added ✓';
     add.classList.add('is-added');
     setTimeout(() => {
-      add.textContent = 'Add to quote';
+      add.textContent = store.ctaLabel;
       add.classList.remove('is-added');
     }, 1400);
   });

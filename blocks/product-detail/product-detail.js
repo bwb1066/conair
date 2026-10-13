@@ -121,7 +121,7 @@ export default async function decorate(block) {
     <label class="product-detail-qtylabel">Qty
       <input type="number" class="product-detail-qty" min="${product.min_order_qty || 1}" value="${qty}">
     </label>
-    <button type="button" class="product-detail-add">Add to quote</button>`;
+    <button type="button" class="product-detail-add">${store.ctaLabel}</button>`;
 
   const qtyInput = controls.querySelector('.product-detail-qty');
   const addBtn = controls.querySelector('.product-detail-add');
@@ -141,7 +141,7 @@ export default async function decorate(block) {
     addBtn.textContent = 'Added ✓';
     addBtn.classList.add('is-added');
     setTimeout(() => {
-      addBtn.textContent = 'Add to quote';
+      addBtn.textContent = store.ctaLabel;
       addBtn.classList.remove('is-added');
     }, 1400);
   });
