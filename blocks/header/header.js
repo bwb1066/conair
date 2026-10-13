@@ -1,4 +1,6 @@
-import { getConfig, getMetadata, ifLocalStorage } from '../../scripts/ak.js';
+import {
+  getConfig, getMetadata, ifLocalStorage, loadBlock,
+} from '../../scripts/ak.js';
 import { loadFragment } from '../fragment/fragment.js';
 import { setColorScheme } from '../section-metadata/section-metadata.js';
 import store from '../../scripts/commerce.js';
@@ -333,9 +335,23 @@ function makeSection(nodes) {
   return section;
 }
 
-// Cart badge, kept in sync with the commerce store on every page. The
-// quote-cart block (authored in the nav fragment) finds `.nav-cart-count` and
-// turns its link into the drawer trigger.
+// Load the quote-cart drawer on demand, so the header cart works on every
+// page without authoring the block anywhere. quote-cart's decorate() finds
+// `.nav-cart-count`, marks its link `data-quote-wired` and opens the drawer on
+// click from then on.
+let cartLoading = null;
+function loadCartDrawer() {
+  if (!cartLoading) {
+    const block = document.createElement('div');
+    block.className = 'quote-cart';
+    document.body.append(block);
+    cartLoading = loadBlock(block);
+  }
+  return cartLoading;
+}
+
+// Cart badge, kept in sync with the commerce store on every page. The first
+// click loads the drawer, then replays the click so quote-cart opens it.
 function wireCart(a) {
   const count = document.createElement('span');
   count.className = 'cart-count nav-cart-count';
@@ -347,6 +363,12 @@ function wireCart(a) {
   };
   store.subscribe(sync);
   sync(store.getQuote());
+  a.addEventListener('click', async (e) => {
+    if (a.dataset.quoteWired) return; // quote-cart's own handler opens it
+    e.preventDefault();
+    await loadCartDrawer();
+    if (a.dataset.quoteWired) a.click();
+  });
 }
 
 // "Ask Mira" — Brand Concierge trigger, first in the utility row. Reuses the
