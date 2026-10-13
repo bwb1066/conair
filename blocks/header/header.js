@@ -1,6 +1,8 @@
 import { getConfig, getMetadata, ifLocalStorage } from '../../scripts/ak.js';
 import { loadFragment } from '../fragment/fragment.js';
 import { setColorScheme } from '../section-metadata/section-metadata.js';
+import store from '../../scripts/commerce.js';
+import { SPARKLE_SVG } from '../../scripts/sparkle-icon.js';
 
 const { locale } = getConfig();
 
@@ -331,6 +333,39 @@ function makeSection(nodes) {
   return section;
 }
 
+// Cart badge, kept in sync with the commerce store on every page. The
+// quote-cart block (authored in the nav fragment) finds `.nav-cart-count` and
+// turns its link into the drawer trigger.
+function wireCart(a) {
+  const count = document.createElement('span');
+  count.className = 'cart-count nav-cart-count';
+  a.append(count);
+  const sync = (quote) => {
+    const n = store.quoteCount(quote);
+    count.textContent = n;
+    a.classList.toggle('has-items', n > 0);
+  };
+  store.subscribe(sync);
+  sync(store.getQuote());
+}
+
+// "Ask Mira" — Brand Concierge trigger, first in the utility row. Reuses the
+// .action-link icon treatment; the widget is only fetched on first click.
+function addConciergeAction(list) {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'action-link action-concierge';
+  btn.innerHTML = `${SPARKLE_SVG}<span class="text">Ask Mira</span>`;
+  btn.querySelector('svg').classList.add('action-icon');
+  btn.addEventListener('click', async () => {
+    const { default: openBrandConcierge } = await import('../../scripts/brand-concierge-trigger.js');
+    openBrandConcierge();
+  });
+  const li = document.createElement('li');
+  li.append(btn);
+  list.prepend(li);
+}
+
 function decorateActionLinks(list) {
   for (const a of list.querySelectorAll('a')) {
     const key = a.textContent.trim().toLowerCase().replace(/\s*\(.*\)/, '');
@@ -341,12 +376,7 @@ function decorateActionLinks(list) {
       label.className = 'text';
       label.textContent = a.textContent.trim();
       a.replaceChildren(makeIcon(d), label);
-      if (key === 'cart') {
-        const count = document.createElement('span');
-        count.className = 'cart-count';
-        [count.textContent] = a.title.match(/\d+/) || ['0'];
-        a.append(count);
-      }
+      if (key === 'cart') wireCart(a);
     }
   }
 }
@@ -386,7 +416,10 @@ function normalizeNav(fragment) {
   const toggleP = document.createElement('p');
   toggleP.append(toggleLink);
 
-  if (actionList) decorateActionLinks(actionList);
+  if (actionList) {
+    decorateActionLinks(actionList);
+    addConciergeAction(actionList);
+  }
 
   rest[0].replaceWith(
     makeSection([brandP, toggleP]),

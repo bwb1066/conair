@@ -142,7 +142,12 @@ header {
     justify-content: center;
     width: 40px;
     height: 40px;
+    padding: 0;
+    border: 0;
     border-radius: 50%;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
     transition: background-color 0.2s;
 
     &:hover {
