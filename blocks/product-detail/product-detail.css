@@ -212,3 +212,10 @@ main .section:has(.product-detail) {
 
   .product-detail .product-detail-head { grid-column: 1 / -1; }
 }
+
+.product-detail .product-detail-price s {
+  margin-left: 8px;
+  color: var(--dark-color, #505050);
+}
+
+.product-detail .product-detail-grid-wrap:empty { display: none; }

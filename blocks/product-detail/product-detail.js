@@ -126,10 +126,20 @@ export default async function decorate(block) {
   const qtyInput = controls.querySelector('.product-detail-qty');
   const addBtn = controls.querySelector('.product-detail-add');
 
+  // Single-price products (B2C retail, no volume breaks) get a plain price, with
+  // the list price struck through when a member/contract price applies; the
+  // per-qty wording and the break table only render when breaks exist.
+  const hasBreaks = (product.price_breaks || []).length > 0;
   const refresh = () => {
     const unit = store.resolvePrice(product, qty, buyer);
-    priceLine.innerHTML = `<strong>${store.formatPrice(unit)}</strong> <span>/ ${product.uom || 'each'} at qty ${qty}</span>`;
-    grid.replaceChildren(priceGrid(product, qty));
+    if (hasBreaks) {
+      priceLine.innerHTML = `<strong>${store.formatPrice(unit)}</strong> <span>/ ${product.uom || 'each'} at qty ${qty}</span>`;
+      grid.replaceChildren(priceGrid(product, qty));
+    } else {
+      const list = Number(product.list_price);
+      priceLine.innerHTML = `<strong>${store.formatPrice(unit)}</strong>${unit < list ? ` <s>${store.formatPrice(list)}</s>` : ''}`;
+      grid.replaceChildren();
+    }
   };
 
   qtyInput.addEventListener('input', () => {
